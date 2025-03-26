@@ -7,24 +7,21 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
-   Widget build(BuildContext context) {
-      return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          
-          body: Center(
-            child: Text(
-              "Hello World!",
-              style: TextStyle(
-                fontFamily: "Boldonse",
-                fontSize: 60,
-                color: const Color.fromARGB(255, 13, 9, 121),
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        body: ListView.builder(
+          itemCount: 50,
+          itemBuilder: (BuildContext context, int index) {
+            return ListTile(
+              title: Center(
+                child: Text("Item $index"),
               ),
-            ),
-          ),
+            );
+          },
         ),
-      );
-    }
+      ),
+    );
   }
+}
