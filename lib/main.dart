@@ -1,79 +1,85 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const NavigationApp());
+  runApp(const ImageGridApp());
 }
 
-class NavigationApp extends StatelessWidget {
-  const NavigationApp({super.key});
+class ImageGridApp extends StatelessWidget {
+  const ImageGridApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const FirstScreen(),
+      title: 'Responsive Grid',
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+      ),
+      home: const ImageGridScreen(),
     );
   }
 }
 
-class FirstScreen extends StatelessWidget {
-  const FirstScreen({super.key});
+class ImageGridScreen extends StatelessWidget {
+  const ImageGridScreen({super.key});
+
+  final List<String> imageUrls = const [
+    'https://png.pngtree.com/thumb_back/fh260/background/20240801/pngtree-new-cb-background-images-photos-pics-wallpaper-pictures-image_16123145.jpg',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSca37bB9I9ja8qwz6MXq84Gb4VR1zoxkwGLg&s',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe_OlHEe2L-0VtexCxjIV5tc0dLor3wd57Yg&s',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShfrLRLJDTroCqhzzPtqh-4kjWA5L1JmBKbg&s',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSca37bB9I9ja8qwz6MXq84Gb4VR1zoxkwGLg&s',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRG2pcubqMbL0tKpJOt_5ygJe4vGSLBKF7ttw&s',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSA6MLT2lpj3M85eFPT2oNNivGYx_saZEww8Q&s',
+  ];
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final crossAxisCount = screenWidth < 600
+        ? 2
+        : screenWidth < 900
+            ? 3
+            : 4; // Adjust the number of columns based on screen width
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Welcome'),
-        backgroundColor: const Color.fromARGB(255, 30, 11, 197),
-        centerTitle: true,
-      ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const SecondScreen()),
+      appBar: AppBar(title: const Text('Responsive Image Grid')),
+      body: Padding(
+        padding: const EdgeInsets.all(10),
+        child: GridView.builder(
+          itemCount: imageUrls.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 1,
+          ),
+          itemBuilder: (context, index) {
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                imageUrls[index],
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              (loadingProgress.expectedTotalBytes ?? 1)
+                          : null,
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return const Center(
+                    child:
+                        Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                  );
+                },
+              ),
             );
           },
-          child: const Text('See My New Car'),
-        ),
-      ),
-    );
-  }
-}
-
-class SecondScreen extends StatelessWidget {
-  const SecondScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Car'),
-        backgroundColor: const Color.fromARGB(255, 83, 198, 230),
-        centerTitle: true,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/image/car_pic.jpeg',
-              width: 200,
-              height: 200,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return const Text('Image not found');
-              },
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Back to Welcome'),
-            ),
-          ],
         ),
       ),
     );
