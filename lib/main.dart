@@ -10,12 +10,61 @@ class ImageGridApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Responsive Grid',
+      title: 'Navigation Drawer App',
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       ),
-      home: const ImageGridScreen(),
+      home: const HomeScreen(),
+    );
+  }
+}
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Home')),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(color: Colors.blue),
+              child: Text(
+                'Navigation Drawer',
+                style: TextStyle(color: Colors.white, fontSize: 24),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.grid_view),
+              title: const Text('Image Grid'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ImageGridScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.info),
+              title: const Text('About'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AboutScreen()),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+      body: const Center(
+        child: Text('Welcome to the Home Screen!'),
+      ),
     );
   }
 }
@@ -40,10 +89,10 @@ class ImageGridScreen extends StatelessWidget {
         ? 2
         : screenWidth < 900
             ? 3
-            : 4; // Adjust the number of columns based on screen width
+            : 4;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Responsive Image Grid')),
+      appBar: AppBar(title: const Text('Image Grid')),
       body: Padding(
         padding: const EdgeInsets.all(10),
         child: GridView.builder(
@@ -80,6 +129,24 @@ class ImageGridScreen extends StatelessWidget {
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+class AboutScreen extends StatelessWidget {
+  const AboutScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('About')),
+      body: const Center(
+        child: Text(
+          'This is a demo app showcasing a navigation drawer with multiple screens.',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 18),
         ),
       ),
     );
