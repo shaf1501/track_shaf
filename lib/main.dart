@@ -1,132 +1,161 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const BottomNavBarApp());
+  runApp(const CustomCardApp());
 }
 
-class BottomNavBarApp extends StatelessWidget {
-  const BottomNavBarApp({super.key});
+class CustomCardApp extends StatelessWidget {
+  const CustomCardApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Bottom Navigation Bar App',
+      title: 'Custom Card',
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       ),
-      home: const BottomNavBarScreen(),
+      home: const CardListScreen(),
     );
   }
 }
 
-class BottomNavBarScreen extends StatefulWidget {
-  const BottomNavBarScreen({super.key});
+class CardListScreen extends StatelessWidget {
+  const CardListScreen({super.key});
 
-  @override
-  State<BottomNavBarScreen> createState() => _BottomNavBarScreenState();
-}
-
-class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
-  int _currentIndex = 0;
-
-  final List<Widget> _screens = [
-    const HomeTab(),
-    const SearchTab(),
-    const ProfileTab(),
+  final List<Map<String, String>> items = const [
+    {
+      'image':
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSca37bB9I9ja8qwz6MXq84Gb4VR1zoxkwGLg&s',
+      'title': 'Picture 1',
+      'subtitle': 'Subtitle 1',
+      'description': 'This is the description for picture 1.',
+    },
+    {
+      'image':
+          'https://png.pngtree.com/thumb_back/fh260/background/20240801/pngtree-new-cb-background-images-photos-pics-wallpaper-pictures-image_16123145.jpg',
+      'title': 'Picture 2',
+      'subtitle': 'Subtitle 2',
+      'description': 'This is the description for picture 2.',
+    },
+    {
+      'image':
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShfrLRLJDTroCqhzzPtqh-4kjWA5L1JmBKbg&s',
+      'title': 'Picture 3',
+      'subtitle': 'Subtitle 3',
+      'description': 'This is the description for picture 3.',
+    },
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Bottom Navigation Bar App'),
-      ),
-      body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
+      appBar: AppBar(title: const Text('Custom Card List')),
+      body: ListView.builder(
+        padding: const EdgeInsets.all(10),
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          final item = items[index];
+          return CustomCard(
+            image: item['image']!,
+            title: item['title']!,
+            subtitle: item['subtitle']!,
+            description: item['description']!,
+          );
         },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
       ),
     );
   }
 }
 
-class HomeTab extends StatelessWidget {
-  const HomeTab({super.key});
+class CustomCard extends StatefulWidget {
+  final String image;
+  final String title;
+  final String subtitle;
+  final String description;
+
+  const CustomCard({
+    super.key,
+    required this.image,
+    required this.title,
+    required this.subtitle,
+    required this.description,
+  });
 
   @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.home, size: 100, color: Colors.blue),
-          SizedBox(height: 20),
-          Text(
-            'Welcome to the Home Tab!',
-            style: TextStyle(fontSize: 18),
-          ),
-        ],
-      ),
-    );
-  }
+  State<CustomCard> createState() => _CustomCardState();
 }
 
-class SearchTab extends StatelessWidget {
-  const SearchTab({super.key});
+class _CustomCardState extends State<CustomCard> {
+  bool _isHovered = false;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.search, size: 100, color: Colors.green),
-          SizedBox(height: 20),
-          Text(
-            'Search for something here!',
-            style: TextStyle(fontSize: 18),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class ProfileTab extends StatelessWidget {
-  const ProfileTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.person, size: 100, color: Colors.purple),
-          SizedBox(height: 20),
-          Text(
-            'This is your Profile Tab!',
-            style: TextStyle(fontSize: 18),
-          ),
-        ],
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _isHovered = !_isHovered;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        margin: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: _isHovered ? Colors.blue[50] : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                widget.image,
+                width: 80,
+                height: 80,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    widget.subtitle,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    widget.description,
+                    style: const TextStyle(fontSize: 14),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
