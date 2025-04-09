@@ -1,153 +1,132 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const ImageGridApp());
+  runApp(const BottomNavBarApp());
 }
 
-class ImageGridApp extends StatelessWidget {
-  const ImageGridApp({super.key});
+class BottomNavBarApp extends StatelessWidget {
+  const BottomNavBarApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Navigation Drawer App',
+      title: 'Bottom Navigation Bar App',
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       ),
-      home: const HomeScreen(),
+      home: const BottomNavBarScreen(),
     );
   }
 }
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class BottomNavBarScreen extends StatefulWidget {
+  const BottomNavBarScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
-              child: Text(
-                'Navigation Drawer',
-                style: TextStyle(color: Colors.white, fontSize: 24),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.grid_view),
-              title: const Text('Image Grid'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ImageGridScreen()),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.info),
-              title: const Text('About'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AboutScreen()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-      body: const Center(
-        child: Text('Welcome to the Home Screen!'),
-      ),
-    );
-  }
+  State<BottomNavBarScreen> createState() => _BottomNavBarScreenState();
 }
 
-class ImageGridScreen extends StatelessWidget {
-  const ImageGridScreen({super.key});
+class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
+  int _currentIndex = 0;
 
-  final List<String> imageUrls = const [
-    'https://png.pngtree.com/thumb_back/fh260/background/20240801/pngtree-new-cb-background-images-photos-pics-wallpaper-pictures-image_16123145.jpg',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSca37bB9I9ja8qwz6MXq84Gb4VR1zoxkwGLg&s',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe_OlHEe2L-0VtexCxjIV5tc0dLor3wd57Yg&s',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShfrLRLJDTroCqhzzPtqh-4kjWA5L1JmBKbg&s',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSca37bB9I9ja8qwz6MXq84Gb4VR1zoxkwGLg&s',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRG2pcubqMbL0tKpJOt_5ygJe4vGSLBKF7ttw&s',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSA6MLT2lpj3M85eFPT2oNNivGYx_saZEww8Q&s',
+  final List<Widget> _screens = [
+    const HomeTab(),
+    const SearchTab(),
+    const ProfileTab(),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final crossAxisCount = screenWidth < 600
-        ? 2
-        : screenWidth < 900
-            ? 3
-            : 4;
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Image Grid')),
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child: GridView.builder(
-          itemCount: imageUrls.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 1,
+      appBar: AppBar(
+        title: const Text('Bottom Navigation Bar App'),
+      ),
+      body: _screens[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
           ),
-          itemBuilder: (context, index) {
-            return ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                imageUrls[index],
-                fit: BoxFit.cover,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Center(
-                    child: CircularProgressIndicator(
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                              (loadingProgress.expectedTotalBytes ?? 1)
-                          : null,
-                    ),
-                  );
-                },
-                errorBuilder: (context, error, stackTrace) {
-                  return const Center(
-                    child:
-                        Icon(Icons.broken_image, size: 50, color: Colors.grey),
-                  );
-                },
-              ),
-            );
-          },
-        ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: 'Search',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
       ),
     );
   }
 }
 
-class AboutScreen extends StatelessWidget {
-  const AboutScreen({super.key});
+class HomeTab extends StatelessWidget {
+  const HomeTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('About')),
-      body: const Center(
-        child: Text(
-          'This is a demo app showcasing a navigation drawer with multiple screens.',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 18),
-        ),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.home, size: 100, color: Colors.blue),
+          SizedBox(height: 20),
+          Text(
+            'Welcome to the Home Tab!',
+            style: TextStyle(fontSize: 18),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SearchTab extends StatelessWidget {
+  const SearchTab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.search, size: 100, color: Colors.green),
+          SizedBox(height: 20),
+          Text(
+            'Search for something here!',
+            style: TextStyle(fontSize: 18),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ProfileTab extends StatelessWidget {
+  const ProfileTab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.person, size: 100, color: Colors.purple),
+          SizedBox(height: 20),
+          Text(
+            'This is your Profile Tab!',
+            style: TextStyle(fontSize: 18),
+          ),
+        ],
       ),
     );
   }
