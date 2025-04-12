@@ -1,100 +1,144 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const DateTimePickerApp());
+  runApp(const CustomDrawerApp());
 }
 
-class DateTimePickerApp extends StatelessWidget {
-  const DateTimePickerApp({super.key});
+class CustomDrawerApp extends StatelessWidget {
+  const CustomDrawerApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Date & Time Picker',
+      title: 'Custom Drawer',
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       ),
-      home: const DateTimePickerScreen(),
+      home: const CustomDrawerScreen(),
     );
   }
 }
 
-class DateTimePickerScreen extends StatefulWidget {
-  const DateTimePickerScreen({super.key});
+class CustomDrawerScreen extends StatefulWidget {
+  const CustomDrawerScreen({super.key});
 
   @override
-  State<DateTimePickerScreen> createState() => _DateTimePickerScreenState();
+  State<CustomDrawerScreen> createState() => _CustomDrawerScreenState();
 }
 
-class _DateTimePickerScreenState extends State<DateTimePickerScreen> {
-  DateTime? _selectedDate;
-  TimeOfDay? _selectedTime;
+class _CustomDrawerScreenState extends State<CustomDrawerScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<Offset> _slideAnimation;
+  late Animation<double> _fadeAnimation;
 
-  void _pickDate() async {
-    DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
     );
 
-    if (pickedDate != null) {
-      setState(() {
-        _selectedDate = pickedDate;
-      });
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(-1.0, 0.0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+  }
+
+  void _toggleDrawer() {
+    if (_animationController.isDismissed) {
+      _animationController.forward();
+    } else {
+      _animationController.reverse();
     }
   }
 
-  void _pickTime() async {
-    TimeOfDay? pickedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-
-    if (pickedTime != null) {
-      setState(() {
-        _selectedTime = pickedTime;
-      });
-    }
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Date & Time Picker')),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ElevatedButton(
-                onPressed: _pickDate,
-                child: const Text('Pick a Date'),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: _pickTime,
-                child: const Text('Pick a Time'),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                _selectedDate != null
-                    ? 'Selected Date: ${_selectedDate!.toLocal()}'.split(' ')[0]
-                    : 'No date selected',
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                _selectedTime != null
-                    ? 'Selected Time: ${_selectedTime!.format(context)}'
-                    : 'No time selected',
-                style: const TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
+      appBar: AppBar(
+        title: const Text('Custom Drawer'),
+        leading: IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: _toggleDrawer,
         ),
+      ),
+      body: Stack(
+        children: [
+          const Center(
+            child: Text(
+              'Main Content Area',
+              style: TextStyle(fontSize: 18),
+            ),
+          ),
+          SlideTransition(
+            position: _slideAnimation,
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: SafeArea(
+                child: Container(
+                  width: 250,
+                  color: Colors.blue[100],
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Text(
+                          'Menu',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.home),
+                        title: const Text('Home'),
+                        onTap: () {
+                          // Handle Home action
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.settings),
+                        title: const Text('Settings'),
+                        onTap: () {
+                          // Handle Settings action
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.logout),
+                        title: const Text('Logout'),
+                        onTap: () {
+                          // Handle Logout action
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
