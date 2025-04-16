@@ -1,66 +1,94 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const AnimatedContainerApp());
+  runApp(const SettingsApp());
 }
 
-class AnimatedContainerApp extends StatelessWidget {
-  const AnimatedContainerApp({super.key});
+class SettingsApp extends StatefulWidget {
+  const SettingsApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Animated Container',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-      ),
-      home: const AnimatedContainerScreen(),
-    );
-  }
+  State<SettingsApp> createState() => _SettingsAppState();
 }
 
-class AnimatedContainerScreen extends StatefulWidget {
-  const AnimatedContainerScreen({super.key});
+class _SettingsAppState extends State<SettingsApp> {
+  bool _isDarkMode = false;
 
-  @override
-  State<AnimatedContainerScreen> createState() =>
-      _AnimatedContainerScreenState();
-}
-
-class _AnimatedContainerScreenState extends State<AnimatedContainerScreen> {
-  bool _isExpanded = false;
-
-  void _toggleContainer() {
+  void _toggleDarkMode(bool value) {
     setState(() {
-      _isExpanded = !_isExpanded;
+      _isDarkMode = value;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Settings Screen',
+      theme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.light,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blue,
+          brightness: Brightness.light,
+        ),
+      ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blue,
+          brightness: Brightness.dark,
+        ),
+      ),
+      themeMode: _isDarkMode
+          ? ThemeMode.dark
+          : ThemeMode.light, // Dynamically set theme mode
+      home: SettingsScreen(
+        isDarkMode: _isDarkMode,
+        onToggleDarkMode: _toggleDarkMode,
+      ),
+    );
+  }
+}
+
+class SettingsScreen extends StatelessWidget {
+  final bool isDarkMode;
+  final ValueChanged<bool> onToggleDarkMode;
+
+  const SettingsScreen({
+    super.key,
+    required this.isDarkMode,
+    required this.onToggleDarkMode,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Animated Container'),
+        title: const Text('Settings'),
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.easeInOut,
-              width: _isExpanded ? 200 : 100,
-              height: _isExpanded ? 200 : 100,
-              decoration: BoxDecoration(
-                color: _isExpanded ? Colors.blue : Colors.red,
-                borderRadius: BorderRadius.circular(_isExpanded ? 50 : 10),
-              ),
+            const Text(
+              'Appearance',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _toggleContainer,
-              child: const Text('Animate Container'),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Dark Mode',
+                  style: TextStyle(fontSize: 16),
+                ),
+                Switch(
+                  value: isDarkMode,
+                  onChanged: onToggleDarkMode,
+                ),
+              ],
             ),
           ],
         ),
